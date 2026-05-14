@@ -62,9 +62,10 @@ if ($resultSetores) {
 $ultimaA = ["temperatura" => "--", "umidade" => "--"];
 $ultimaB = ["temperatura" => "--", "umidade" => "--"];
 
-$resultUltimas = $conexao->query("SELECT setor_id, temperatura, umidade FROM leituras WHERE setor_id IN (1,2) ORDER BY id DESC LIMIT 30");
+// Busca o último registro de cada setor
+$resultUltimas = $conexao->query("SELECT setor_id, temperatura, umidade FROM leituras WHERE setor_id IN (1,2) ORDER BY id DESC LIMIT 100");
 
-if ($resultUltimas) {
+if ($resultUltimas && $resultUltimas->num_rows > 0) {
     while ($l = $resultUltimas->fetch_assoc()) {
         if ((int)$l['setor_id'] === 1 && $ultimaA['temperatura'] === "--") {
             $ultimaA['temperatura'] = number_format((float)$l['temperatura'], 1, ',', '.');
@@ -79,6 +80,8 @@ if ($resultUltimas) {
 }
 
 $graficoTempServidores = montarSerie($conexao, $campoData, 'temperatura', 1, 30);
+$graficoUmidadeServidores = montarSerie($conexao, $campoData, 'umidade', 1, 30);
+$graficoTempDocumentos = montarSerie($conexao, $campoData, 'temperatura', 2, 30);
 $graficoUmidadeDocumentos = montarSerie($conexao, $campoData, 'umidade', 2, 30);
 ?>
 <!DOCTYPE html>
@@ -210,6 +213,20 @@ $graficoUmidadeDocumentos = montarSerie($conexao, $campoData, 'umidade', 2, 30);
                         <canvas id="umidadeChartB"></canvas>
                     </div>
                 </div>
+
+                <div class="chart-box">
+                    <h3>Setor Servidores - Umidade</h3>
+                    <div class="chart-area">
+                        <canvas id="umidadeChartA"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-box">
+                    <h3>Setor Documentos - Temperatura</h3>
+                    <div class="chart-area">
+                        <canvas id="tempChartB"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -221,6 +238,20 @@ $graficoUmidadeDocumentos = montarSerie($conexao, $campoData, 'umidade', 2, 30);
             labels: <?= json_encode($graficoTempServidores['labels']) ?>,
             dados: <?= json_encode($graficoTempServidores['dados']) ?>,
             label: 'Temperatura Servidores',
+            cor: '#a3ff12'
+        };
+
+        window.graficoUmidadeA = {
+            labels: <?= json_encode($graficoUmidadeServidores['labels']) ?>,
+            dados: <?= json_encode($graficoUmidadeServidores['dados']) ?>,
+            label: 'Umidade Servidores',
+            cor: '#12b8ff'
+        };
+
+        window.graficoTemperaturaB = {
+            labels: <?= json_encode($graficoTempDocumentos['labels']) ?>,
+            dados: <?= json_encode($graficoTempDocumentos['dados']) ?>,
+            label: 'Temperatura Documentos',
             cor: '#a3ff12'
         };
 
