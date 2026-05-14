@@ -1,7 +1,7 @@
 <?php
 /** ALTERAR */
 $host = "sql10.freesqldatabase.com";
-$usuario = " sql10826718";
+$usuario = "sql10826718";
 $senha = "cVlBuFfFwc";
 $banco = "sql10826718";
 
