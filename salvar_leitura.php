@@ -26,8 +26,6 @@ if (!$data) {
 $setor_id = intval($data["setor_id"] ?? 0);
 $temp = floatval($data["temperatura"] ?? 0);
 $umid = floatval($data["umidade"] ?? 0);
-$alerta = intval($data["alerta_ativo"] ?? 0);
-$motivo = $data["motivo_alerta"] ?? null;
 
 if ($setor_id <= 0) {
   http_response_code(400);
@@ -35,8 +33,24 @@ if ($setor_id <= 0) {
   exit;
 }
 
-$sql = "INSERT INTO leituras (setor_id, temperatura, umidade, alerta_ativo, motivo_alerta)
-        VALUES (?, ?, ?, ?, ?)";
+// Verificar se gera alerta
+$alerta_ativo = 0;
+$motivo_alerta = "";
+
+if ($temp > 30) {
+  $alerta_ativo = 1;
+  $motivo_alerta = "Temperatura acima do limite";
+}
+
+if ($umid > 85) {
+  $alerta_ativo = 1;
+  $motivo_alerta = $motivo_alerta 
+    ? $motivo_alerta . " e umidade acima do limite"
+    : "Umidade acima do limite";
+}
+
+$sql = "INSERT INTO leituras (setor_id, temperatura, umidade, alerta_ativo, motivo_alerta, criado_em)
+        VALUES (?, ?, ?, ?, ?, NOW())";
 $stmt = $conexao->prepare($sql);
 if (!$stmt) {
   http_response_code(500);
@@ -45,10 +59,42 @@ if (!$stmt) {
   exit;
 }
 
-$stmt->bind_param("iddis", $setor_id, $temp, $umid, $alerta, $motivo);
+$stmt->bind_param("iddis", $setor_id, $temp, $umid, $alerta_ativo, $motivo_alerta);
 
 if ($stmt->execute()) {
-  echo json_encode(["ok" => true, "id" => $stmt->insert_id]);
+  $leitura_id = $stmt->insert_id;
+  
+  // Se gerou alerta, criar registro na tabela de alarmes
+  if ($alerta_ativo == 1) {
+    $tipo = "ALERTA";
+    $status = "ativo";
+    
+    $sqlAlarme = "INSERT INTO alarmes (leitura_id, setor_id, tipo, mensagem, temperatura, umidade, status, criado_em)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+    
+    $stmtAlarme = $conexao->prepare($sqlAlarme);
+    if ($stmtAlarme) {
+      $stmtAlarme->bind_param(
+        "iissdds",
+        $leitura_id,
+        $setor_id,
+        $tipo,
+        $motivo_alerta,
+        $temp,
+        $umid,
+        $status
+      );
+      $stmtAlarme->execute();
+      $stmtAlarme->close();
+    }
+  }
+  
+  echo json_encode([
+    "ok" => true, 
+    "id" => $leitura_id,
+    "alerta" => $alerta_ativo,
+    "motivo" => $motivo_alerta
+  ]);
 } else {
   http_response_code(500);
   echo json_encode(["ok" => false, "erro" => "insert"]);

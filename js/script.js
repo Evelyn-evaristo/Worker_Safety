@@ -154,11 +154,12 @@ function criarGraficoLinha(canvasId, dadosGrafico) {
     });
 }
 
-criarGraficoLinha("tempChart", window.graficoTemperatura);
-criarGraficoLinha("tempChartA", window.graficoTemperaturaA);
-criarGraficoLinha("tempChartB", window.graficoTemperaturaB);
-criarGraficoLinha("umidadeChartA", window.graficoUmidadeA);
-criarGraficoLinha("umidadeChartB", window.graficoUmidadeB);
+// Criar gráficos se existirem
+if (window.graficoTemperatura) criarGraficoLinha("tempChart", window.graficoTemperatura);
+if (window.graficoTemperaturaA) criarGraficoLinha("tempChartA", window.graficoTemperaturaA);
+if (window.graficoTemperaturaB) criarGraficoLinha("tempChartB", window.graficoTemperaturaB);
+if (window.graficoUmidadeA) criarGraficoLinha("umidadeChartA", window.graficoUmidadeA);
+if (window.graficoUmidadeB) criarGraficoLinha("umidadeChartB", window.graficoUmidadeB);
 
 const autoRefresh = Number(document.body?.dataset?.autoRefresh || 0);
 
