@@ -1,4 +1,5 @@
 <?php
+/** ALTERAR */
 $host = "localhost";
 $usuario = "root";
 $senha = "";

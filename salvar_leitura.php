@@ -33,7 +33,6 @@ if ($setor_id <= 0) {
   exit;
 }
 
-// Verificar se gera alerta
 $alerta_ativo = 0;
 $motivo_alerta = "";
 
@@ -64,7 +63,6 @@ $stmt->bind_param("iddis", $setor_id, $temp, $umid, $alerta_ativo, $motivo_alert
 if ($stmt->execute()) {
   $leitura_id = $stmt->insert_id;
   
-  // Se gerou alerta, criar registro na tabela de alarmes
   if ($alerta_ativo == 1) {
     $tipo = "ALERTA";
     $status = "ativo";

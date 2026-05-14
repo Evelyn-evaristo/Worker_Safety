@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . "/conexao.php";
 
-// Inserir dados de teste
 $dados_teste = [
     ['setor_id' => 1, 'temperatura' => 22.5, 'umidade' => 65.0],
     ['setor_id' => 1, 'temperatura' => 23.1, 'umidade' => 66.5],

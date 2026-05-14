@@ -170,13 +170,9 @@ if ($res) {
                     <?php foreach ($alertas as $a): ?>
                         <li>
                             <strong><?= htmlspecialchars($a['nome_setor'] ?: 'Setor ' . $a['setor_id']) ?></strong>
-                            |
                             <?= $a['criado_em'] ? date('d/m/Y H:i:s', strtotime($a['criado_em'])) : 'Sem horário' ?>
-                            |
                             <?= htmlspecialchars($a['mensagem'] ?: 'Fora do limite') ?>
-                            |
                             T: <?= number_format((float)$a['temperatura'], 1, ',', '.') ?>°C
-                            /
                             U: <?= number_format((float)$a['umidade'], 1, ',', '.') ?>%
                         </li>
                     <?php endforeach; ?>
