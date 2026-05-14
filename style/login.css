@@ -1,0 +1,146 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg-main: #091017;
+    --bg-card: #0b1118;
+    --border: #1c2530;
+    --text: #f2f5f7;
+    --muted: #9aa5b1;
+    --accent: #b8ff45;
+    --accent-dark: #0c1117;
+    --danger: #ff6b6b;
+    --success: #77dd77;
+}
+
+body {
+    min-height: 100vh;
+    font-family: "Inter", sans-serif;
+    background: radial-gradient(circle at top, #162231 0%, var(--bg-main) 48%);
+    color: var(--text);
+}
+
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(11, 17, 24, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px;
+    padding: 32px;
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+}
+
+.brand img {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #111a24;
+}
+
+.brand h1 {
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.brand p {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+label {
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+input {
+    width: 100%;
+    height: 48px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: #101923;
+    color: var(--text);
+    padding: 0 16px;
+    font-size: 15px;
+    outline: none;
+}
+
+input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(184, 255, 69, 0.12);
+}
+
+button {
+    height: 50px;
+    border: none;
+    border-radius: 16px;
+    background: var(--accent);
+    color: var(--accent-dark);
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 14px;
+}
+
+button:hover {
+    filter: brightness(1.05);
+}
+
+.auth-link {
+    text-align: center;
+    color: var(--muted);
+    margin-top: 22px;
+    font-size: 14px;
+}
+
+.auth-link a {
+    color: var(--accent);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.message {
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+.message.error {
+    background: rgba(255, 107, 107, 0.12);
+    color: var(--danger);
+    border: 1px solid rgba(255, 107, 107, 0.28);
+}
+
+.message.success {
+    background: rgba(119, 221, 119, 0.12);
+    color: var(--success);
+    border: 1px solid rgba(119, 221, 119, 0.28);
+}

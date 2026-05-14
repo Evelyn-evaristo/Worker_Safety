@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 13/05/2026 às 10:41
+-- Tempo de geração: 14/05/2026 às 18:57
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.0.30
 
@@ -24,28 +24,20 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `configuracoes`
+-- Estrutura para tabela `alarmes`
 --
 
-CREATE TABLE `configuracoes` (
+CREATE TABLE `alarmes` (
   `id` int(11) NOT NULL,
+  `leitura_id` int(11) DEFAULT NULL,
   `setor_id` int(11) NOT NULL,
-  `limite_temp_max` decimal(5,2) NOT NULL,
-  `limite_temp_min` decimal(5,2) NOT NULL,
-  `limite_umidade_max` decimal(5,2) NOT NULL,
-  `limite_umidade_min` decimal(5,2) NOT NULL,
-  `buzzer_ativo` tinyint(1) DEFAULT 1,
-  `led_ativo` tinyint(1) DEFAULT 1,
-  `atualizado_em` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `tipo` varchar(50) NOT NULL,
+  `mensagem` varchar(180) NOT NULL,
+  `temperatura` decimal(5,2) DEFAULT NULL,
+  `umidade` decimal(5,2) DEFAULT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'ativo',
+  `criado_em` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Despejando dados para a tabela `configuracoes`
---
-
-INSERT INTO `configuracoes` (`id`, `setor_id`, `limite_temp_max`, `limite_temp_min`, `limite_umidade_max`, `limite_umidade_min`, `buzzer_ativo`, `led_ativo`, `atualizado_em`) VALUES
-(1, 1, 25.00, 18.00, 70.00, 40.00, 1, 1, '2026-04-13 12:09:20'),
-(2, 2, 22.00, 18.00, 70.00, 45.00, 1, 1, '2026-04-09 14:50:11');
 
 -- --------------------------------------------------------
 
@@ -62,44 +54,6 @@ CREATE TABLE `leituras` (
   `motivo_alerta` varchar(120) DEFAULT NULL,
   `criado_em` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Despejando dados para a tabela `leituras`
---
-
-INSERT INTO `leituras` (`id`, `setor_id`, `temperatura`, `umidade`, `alerta_ativo`, `motivo_alerta`, `criado_em`) VALUES
-(514, 1, 25.30, 0.00, 0, '', '2026-05-06 13:43:23'),
-(515, 2, 0.00, 59.00, 0, '', '2026-05-06 13:43:23'),
-(516, 1, 25.30, 0.00, 0, '', '2026-05-06 13:43:53'),
-(517, 2, 0.00, 59.00, 0, '', '2026-05-06 13:43:53'),
-(518, 1, 25.30, 0.00, 0, '', '2026-05-06 13:44:23'),
-(519, 2, 0.00, 59.00, 0, '', '2026-05-06 13:44:24'),
-(520, 1, 25.30, 0.00, 0, '', '2026-05-06 13:44:53'),
-(521, 2, 0.00, 59.00, 0, '', '2026-05-06 13:44:53'),
-(522, 1, 25.30, 0.00, 0, '', '2026-05-06 13:45:23'),
-(523, 2, 0.00, 59.00, 0, '', '2026-05-06 13:45:23'),
-(524, 1, 26.20, 0.00, 0, '', '2026-05-06 13:45:52'),
-(525, 2, 0.00, 59.00, 0, '', '2026-05-06 13:45:53'),
-(526, 1, 26.20, 0.00, 0, '', '2026-05-06 13:46:23'),
-(527, 2, 0.00, 59.00, 0, '', '2026-05-06 13:46:23'),
-(528, 1, 26.20, 0.00, 0, '', '2026-05-06 13:46:53'),
-(529, 2, 0.00, 59.00, 0, '', '2026-05-06 13:46:53'),
-(530, 1, 25.80, 0.00, 0, '', '2026-05-06 13:47:22'),
-(531, 2, 0.00, 59.00, 0, '', '2026-05-06 13:47:23'),
-(532, 1, 25.80, 0.00, 0, '', '2026-05-06 13:47:53'),
-(533, 2, 0.00, 59.00, 0, '', '2026-05-06 13:47:53'),
-(534, 1, 25.80, 0.00, 0, '', '2026-05-06 13:48:23'),
-(535, 2, 0.00, 59.00, 0, '', '2026-05-06 13:48:23'),
-(536, 1, 25.30, 0.00, 0, '', '2026-05-06 13:48:53'),
-(537, 2, 0.00, 59.00, 0, '', '2026-05-06 13:48:53'),
-(538, 1, 25.30, 0.00, 0, '', '2026-05-06 13:49:23'),
-(539, 2, 0.00, 59.00, 0, '', '2026-05-06 13:49:23'),
-(540, 1, 25.30, 0.00, 0, '', '2026-05-06 13:49:53'),
-(541, 2, 0.00, 59.00, 0, '', '2026-05-06 13:49:53'),
-(542, 1, 25.30, 0.00, 0, '', '2026-05-06 13:50:23'),
-(543, 2, 0.00, 59.00, 0, '', '2026-05-06 13:50:24'),
-(544, 1, 24.80, 0.00, 0, '', '2026-05-06 13:50:53'),
-(545, 2, 0.00, 59.00, 0, '', '2026-05-06 13:50:53');
 
 -- --------------------------------------------------------
 
@@ -147,11 +101,12 @@ INSERT INTO `usuarios` (`id`, `nome`, `email`, `senha`, `criado_em`) VALUES
 --
 
 --
--- Índices de tabela `configuracoes`
+-- Índices de tabela `alarmes`
 --
-ALTER TABLE `configuracoes`
+ALTER TABLE `alarmes`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uq_config_setor` (`setor_id`);
+  ADD KEY `idx_alarm_setor` (`setor_id`),
+  ADD KEY `idx_alarm_status` (`status`);
 
 --
 -- Índices de tabela `leituras`
@@ -179,10 +134,10 @@ ALTER TABLE `usuarios`
 --
 
 --
--- AUTO_INCREMENT de tabela `configuracoes`
+-- AUTO_INCREMENT de tabela `alarmes`
 --
-ALTER TABLE `configuracoes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+ALTER TABLE `alarmes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `leituras`
@@ -205,12 +160,6 @@ ALTER TABLE `usuarios`
 --
 -- Restrições para tabelas despejadas
 --
-
---
--- Restrições para tabelas `configuracoes`
---
-ALTER TABLE `configuracoes`
-  ADD CONSTRAINT `fk_config_setor` FOREIGN KEY (`setor_id`) REFERENCES `setores` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Restrições para tabelas `leituras`
