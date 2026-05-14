@@ -1,9 +1,9 @@
 <?php
 /** ALTERAR */
-$host = "localhost";
-$usuario = "root";
-$senha = "";
-$banco = "worker_safety";
+$host = "sql12.freesqldatabase.com";
+$usuario = "sql12799999";
+$senha = "abc123";
+$banco = "sql12799999";
 
 $conexao = new mysqli($host, $usuario, $senha, $banco);
 
