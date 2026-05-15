@@ -2,33 +2,25 @@
 header('Content-Type: application/json; charset=utf-8');
 require_once "conexao.php";
 
-// =========================
 // Receber JSON do ESP32
-// =========================
 $dados = json_decode(file_get_contents("php://input"), true);
 
 $setor_id = $dados['setor_id'] ?? null;
 $temperatura = $dados['temperatura'] ?? null;
 $umidade = $dados['umidade'] ?? null;
 
-// =========================
 // Validar dados
-// =========================
 if ($setor_id === null || $temperatura === null || $umidade === null) {
     echo json_encode(["erro" => "dados incompletos"]);
     exit;
 }
 
-// =========================
 // Converter tipos
-// =========================
 $setor_id = intval($setor_id);
 $temperatura = floatval($temperatura);
 $umidade = floatval($umidade);
 
-// =========================
-// Alertas
-// =========================
+// Verificar alertas
 $alerta_ativo = 0;
 $motivo_alerta = "";
 
@@ -39,20 +31,25 @@ if ($temperatura > 30) {
 
 if ($umidade > 85) {
     $alerta_ativo = 1;
-
     $motivo_alerta = $motivo_alerta
         ? $motivo_alerta . " e umidade acima do limite"
         : "Umidade acima do limite";
 }
 
-// =========================
 // Salvar leitura
-// =========================
 $sql = "INSERT INTO leituras
 (setor_id, temperatura, umidade, alerta_ativo, motivo_alerta, criado_em)
 VALUES (?, ?, ?, ?, ?, NOW())";
 
 $stmt = $conexao->prepare($sql);
+
+if (!$stmt) {
+    echo json_encode([
+        "erro" => "erro no prepare da leitura",
+        "mysql" => $conexao->error
+    ]);
+    exit;
+}
 
 $stmt->bind_param(
     "iddis",
@@ -68,17 +65,13 @@ if (!$stmt->execute()) {
         "erro" => "erro ao salvar leitura",
         "mysql" => $stmt->error
     ]);
-
     exit;
 }
 
 $leitura_id = $stmt->insert_id;
-
 $stmt->close();
 
-// =========================
-// Salvar alarme
-// =========================
+// Salvar alarme se houver alerta
 if ($alerta_ativo == 1) {
 
     $tipo = "ALERTA";
@@ -89,6 +82,14 @@ if ($alerta_ativo == 1) {
     VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
 
     $stmtAlarme = $conexao->prepare($sqlAlarme);
+
+    if (!$stmtAlarme) {
+        echo json_encode([
+            "erro" => "erro no prepare do alarme",
+            "mysql" => $conexao->error
+        ]);
+        exit;
+    }
 
     $stmtAlarme->bind_param(
         "iissdds",
@@ -101,14 +102,44 @@ if ($alerta_ativo == 1) {
         $status
     );
 
-    $stmtAlarme->execute();
+    if (!$stmtAlarme->execute()) {
+        echo json_encode([
+            "erro" => "erro ao salvar alarme",
+            "mysql" => $stmtAlarme->error
+        ]);
+        exit;
+    }
 
     $stmtAlarme->close();
 }
 
-// =========================
+// Manter apenas as 100 leituras mais recentes
+$conexao->query("
+    DELETE FROM leituras
+    WHERE id NOT IN (
+        SELECT id FROM (
+            SELECT id
+            FROM leituras
+            ORDER BY id DESC
+            LIMIT 100
+        ) AS ultimas_leituras
+    )
+");
+
+// Manter apenas os 100 alarmes mais recentes
+$conexao->query("
+    DELETE FROM alarmes
+    WHERE id NOT IN (
+        SELECT id FROM (
+            SELECT id
+            FROM alarmes
+            ORDER BY id DESC
+            LIMIT 100
+        ) AS ultimos_alarmes
+    )
+");
+
 // Resposta
-// =========================
 echo json_encode([
     "mensagem" => "ok",
     "alerta" => $alerta_ativo,
